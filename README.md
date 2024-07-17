@@ -21,3 +21,6 @@
 |-------------------------------|---------------|
 | Ivanov paper 10<br/>Petrov pens 5<br/>Ivanov marker 3<br/>Ivanov paper 7<br/>Petrov envelope 20<br/>Ivanov envelope 5 |<span align="left">Ivanov:<br/>envelope 5<br/>marker 3<br/>paper 17<br/>Petrov:<br/>envelope 20<br/>pens 5  </span> |
 
+
+## Запуск
+npx ts-node 85SalesSolver.ts
