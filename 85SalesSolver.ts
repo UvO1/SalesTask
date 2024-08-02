@@ -3,8 +3,8 @@ type TInfo = {
   count: number;
 };
 
-type TArrProducts = Array<TInfo>;
-type TMapResult = Map<string, TArrProducts>;
+type TMapProducts = Map<string, number>;
+type TMapResult = Map<string, TMapProducts>;
 
 function isMapHasName(map: TMapResult, name: string) {
   let result: boolean = map.has(name);
@@ -21,31 +21,20 @@ function isNameHasProduct(map: TMapResult, product: string): boolean {
   return result;
 }
 
-function getCountOfProduct(arr: TArrProducts, id: number): number {
-  let count: number = arr[id].count;
-  return count;
-}
-
 function updateProductCount(
-  arrProducts: TArrProducts,
+  arrProducts: TMapProducts,
   product: string,
   count: number
 ) {
-  const indexTempProduct = arrProducts.findIndex((elem) => elem.name === product);
-
-  if (indexTempProduct != -1) {
-    const temp_count: number = getCountOfProduct(
-      arrProducts,
-      indexTempProduct
-    );
-    let new_count: number = count + temp_count;
-    arrProducts[indexTempProduct].count = new_count;
+  if (arrProducts.has(product)) {
+    const temp_count: number | undefined = arrProducts.get(product);
+    let new_count: number = count;
+    if (temp_count) {
+      new_count += temp_count;
+    }
+    arrProducts.set(product, new_count);
   } else {
-    const new_info_product: TInfo = {
-      name: product,
-      count: count,
-    };
-    arrProducts.push(new_info_product);
+    arrProducts.set(product, count);
   }
 
   return arrProducts;
@@ -59,26 +48,21 @@ function getSortedArray(setNames: Set<string>) {
   return arr;
 }
 
-function createNewInfo(product: string, count: number): TArrProducts {
-  const info = {
-    name: product,
-    count: count,
-  };
-  const arr: Array<TInfo> = [];
-  arr.push(info);
-  return arr;
-}
-
 function printResult(map: TMapResult, names: Array<string>) {
   names.map((name: string) => {
     console.log(name + ":");
-    const tempProducts: TArrProducts | undefined = map.get(name);
-    tempProducts?.sort((a: TInfo, b: TInfo): number =>
-      a.name.localeCompare(b.name)
-    );
-    tempProducts?.map((elem: TInfo) => {
-      console.log(elem.name, elem.count);
-    });
+    const tempProducts: TMapProducts | undefined =
+      map.get(name) !== undefined ? map.get(name) : new Map<string, number>();
+    if (tempProducts) {
+      const tArry = Array.from(tempProducts, ([name, count]) => ({
+        name,
+        count,
+      }));
+      tArry?.sort((a: TInfo, b: TInfo): number => a.name.localeCompare(b.name));
+      tArry?.map((elem: TInfo) => {
+        console.log(elem.name, elem.count);
+      });
+    }
   });
 }
 
@@ -93,15 +77,16 @@ function taskSolver(info: Array<string>) {
     const count: number = parseInt(tempArr[2]);
 
     if (isMapHasName(result, name)) {
-      const tempProducts: TArrProducts = result.get(name);
-      const updatedInfoProduct: TArrProducts = updateProductCount(
+      const tempProducts: Map<string, number> = result.get(name);
+      const updatedInfoProduct: TMapProducts = updateProductCount(
         tempProducts,
         product,
         count
       );
       result.set(name, updatedInfoProduct);
     } else {
-      const newArrProducts: TArrProducts = createNewInfo(product, count);
+      const newArrProducts: Map<string, number> = new Map<string, number>();
+      newArrProducts.set(product, count);
       result.set(name, newArrProducts);
     }
     names.add(name);
